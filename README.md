@@ -18,4 +18,4 @@ pip install py-learning
 
 ## License
 
-`py-learning` is distributed under the terms of the [Apache License 2.0](http://www.apache.org/licenses) license.
+`py-learning` is distributed under the terms of the [Apache-2.0](http://www.apache.org/licenses) license.

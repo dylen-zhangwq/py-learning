@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = ''
 readme = "README.md"
 requires-python = ">=3.7"
-license = "MIT"
+license = "Apache-2.0"
 keywords = []
 authors = [
   { name = "dylen", email = "dylen.zhangwq@gmail.com" },
@@ -32,7 +32,7 @@ Issues = "https://github.com/unknown/py-learning/issues"
 Source = "https://github.com/unknown/py-learning"
 
 [tool.hatch.version]
-path = "src/py_learning/__about__.py"
+path = "src/py_learning/__version__.py"
 
 [tool.hatch.envs.default]
 dependencies = [
