@@ -1,134 +1,140 @@
 [build-system]
-requires = ["hatchling"]
 build-backend = "hatchling.build"
+requires = [
+    "hatch-vcs>=0.3",
+    "hatchling>=1.17",
+]
 
 [project]
 name = "py-learning"
-dynamic = ["version"]
-description = ''
+description = "python learn record, new skil and practice cases"
 readme = "README.md"
-requires-python = ">=3.7"
+keywords = [
+    "python",
+    "learn",
+    "new skills",
+    "record",
+]
 license = "Apache-2.0"
-keywords = []
 authors = [
-  { name = "dylen", email = "dylen.zhangwq@gmail.com" },
+    { name = "dylen", email = "dylen.zhangwq@gmail.com" },
 ]
+maintainers = [
+    { name = "Rebecca", email = "rebecca.xuc@gmail.com" },
+]
+requires-python = ">=3.7"
 classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.7",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
 ]
-dependencies = []
+dynamic = [
+    "version",
+]
+dependencies = [
+    "cachetools>=5.3",
+    "chardet>=5.1",
+    "colorama>=0.4.6",
+    "filelock>=3.12",
+    'importlib-metadata>=6.6; python_version < "3.8"',
+    "packaging>=23.1",
+    "platformdirs>=3.5.1",
+    "pluggy>=1",
+    "pyproject-api>=1.5.1",
+    'tomli>=2.0.1; python_version < "3.11"',
+    'typing-extensions>=4.6.2; python_version < "3.8"',
+    "virtualenv>=20.23",
+]
+optional-dependencies.docs = [
+    "furo>=2023.5.20",
+    "sphinx>=7.0.1",
+    "sphinx-argparse-cli>=1.11",
+    "sphinx-autodoc-typehints!=1.23.4,>=1.23",
+    "sphinx-copybutton>=0.5.2",
+    "sphinx-inline-tabs>=2023.4.21",
+    "sphinxcontrib-towncrier>=0.2.1a0",
+    "towncrier>=22.12",
+]
+optional-dependencies.testing = [
+    "build[virtualenv]>=0.10",
+    "covdefaults>=2.3",
+    "devpi-process>=0.3",
+    "diff-cover>=7.5",
+    "distlib>=0.3.6",
+    "flaky>=3.7",
+    "hatch-vcs>=0.3",
+    "hatchling>=1.17",
+    "psutil>=5.9.5",
+    "pytest>=7.3.1",
+    "pytest-cov>=4.1",
+    "pytest-mock>=3.10",
+    "pytest-xdist>=3.3.1",
+    "re-assert>=1.1",
+    'time-machine>=2.9; implementation_name != "pypy"',
+    "wheel>=0.40",
+]
 
 [project.urls]
-Documentation = "https://github.com/unknown/py-learning#readme"
-Issues = "https://github.com/unknown/py-learning/issues"
-Source = "https://github.com/unknown/py-learning"
+Documentation = "https://github.com/dylen-zhangwq/py-learning#readme"
+Issues = "https://github.com/dylen-zhangwq/py-learning/issues"
+Source = "https://github.com/dylen-zhangwq/py-learning"
 
-[tool.hatch.version]
-path = "src/py_learning/__version__.py"
-
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
-[tool.hatch.envs.lint]
-detached = true
-dependencies = [
-  "black>=23.1.0",
-  "mypy>=1.0.0",
-  "ruff>=0.0.243",
-]
-[tool.hatch.envs.lint.scripts]
-typing = "mypy --install-types --non-interactive {args:src/py_learning tests}"
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
+[tool.hatch]
+build.dev-mode-dirs = ["src"]
+build.hooks.vcs.version-file = "src/py_learning/__about__.py"
+build.targets.sdist.include = ["/src", "/tests", "/tox.ini"]
+version.source = "vcs"
 
 [tool.black]
-target-version = ["py37"]
 line-length = 120
-skip-string-normalization = true
 
-[tool.ruff]
-target-version = "py37"
-line-length = 120
-select = [
-  "A",
-  "ARG",
-  "B",
-  "C",
-  "DTZ",
-  "E",
-  "EM",
-  "F",
-  "FBT",
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "Q",
-  "RUF",
-  "S",
-  "T",
-  "TID",
-  "UP",
-  "W",
-  "YTT",
+[tool.coverage]
+html.show_contexts = true
+html.skip_covered = false
+paths.source = [
+    "src",
+    ".tox*/*/lib/python*/site-packages",
+    ".tox*/pypy*/site-packages",
+    ".tox*\\*\\Lib\\site-packages",
+    "*/src",
+    "*\\src",
 ]
-ignore = [
-  # Allow non-abstract empty methods in abstract base classes
-  "B027",
-  # Allow boolean positional values in function calls, like `dict.get(... True)`
-  "FBT003",
-  # Ignore checks for possible passwords
-  "S105", "S106", "S107",
-  # Ignore complexity
-  "C901", "PLR0911", "PLR0912", "PLR0913", "PLR0915",
-]
-unfixable = [
-  # Don't touch unused imports
-  "F401",
+report.fail_under = 88
+report.omit = []
+run.parallel = true
+run.plugins = ["covdefaults"]
+
+[tool.isort]
+known_first_party = ["py_learning", "tests"]
+profile = "black"
+line_length = 120
+
+[tool.mypy]
+python_version = "3.11"
+show_error_codes = true
+strict = true
+overrides = [
+    { module = [
+        "colorama.*",
+        "coverage.*",
+        "distlib.*",
+        "flaky.*",
+        "importlib_metadata.*",
+        "pluggy.*",
+        "psutil.*",
+        "re_assert.*",
+        "virtualenv.*",
+    ], ignore_missing_imports = true },
 ]
 
-[tool.ruff.isort]
-known-first-party = ["py_learning"]
+[tool.pep8]
+max-line-length = "120"
 
 [tool.flake8]
 max-complexity = 22
@@ -137,32 +143,20 @@ unused-arguments-ignore-abstract-functions = true
 noqa-require-code = true
 dictionaries = ["en_US", "python", "technical", "django"]
 ignore = [
-  "E203", # whitespace before ':'
-  "W503", #  line break before binary operator
+    "E203", # whitespace before ':'
+    "W503", #  line break before binary operator
+    "SC200", # possibly misspelt word eg: changelog
 ]
 
-[tool.ruff.flake8-tidy-imports]
-ban-relative-imports = "all"
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=auto -ra --showlocals --no-success-flaky-report"
 
-[tool.ruff.per-file-ignores]
-# Tests can use magic values, assertions, and relative imports
-"tests/**/*" = ["PLR2004", "S101", "TID252"]
-
-[tool.coverage.run]
-source_pkgs = ["py_learning", "tests"]
-branch = true
-parallel = true
-omit = [
-  "src/py_learning/__about__.py",
-]
-
-[tool.coverage.paths]
-py_learning = ["src/py_learning", "*/py-learning/src/py_learning"]
-tests = ["tests", "*/py-learning/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+[tool.towncrier]
+name = "py-learning"
+filename = "docs/changelog.rst"
+directory = "docs/changelog"
+title_format = false
+issue_format = ":issue:`{issue}`"
+template = "docs/changelog/template.jinja2"
+# possible types, all default: feature, bugfix, doc, removal, misc
