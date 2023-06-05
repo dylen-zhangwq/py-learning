@@ -55,7 +55,8 @@ def get_upstream(repo: Repo) -> Remote:
 
 def release_changelog(repo: Repo, version: Version) -> Commit:
     print("generate release commit")
-    os.system(f"towncrier build --yes --config {str(ROOT_SRC_DIR)}/pyproject.toml --version {version.public}")
+    cmd = f"towncrier build --yes --config {str(ROOT_SRC_DIR)}/pyproject.toml --version v{version.public}"
+    os.system(cmd)
     release_commit = repo.index.commit(f"release {version}")
     return release_commit
 
