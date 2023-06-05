@@ -29,7 +29,7 @@ def main(version_str: str) -> None:
         repo.heads.main.checkout()
         repo.delete_head(release_branch, force=True)
         upstream.fetch()
-        repo.git.reset("--hard", "upstream/main")
+        repo.git.reset("--hard", f"{upstream}/main")
     print("All done! ✨ 🍰 ✨")
 
 
@@ -47,9 +47,9 @@ def create_release_branch(repo: Repo, version: Version) -> tuple[Remote, Head]:
 
 def get_upstream(repo: Repo) -> Remote:
     for remote in repo.remotes:
-        if any(url.endswith("dylen-zhangwq/py-learning.git") for url in remote.urls):
+        if any(url.endswith("xuRebecca/py-learning.git") for url in remote.urls):
             return remote
-    raise RuntimeError("could not find dylen-zhangwq/py-learning.git remote")
+    raise RuntimeError("could not find xuRebecca/py-learning.git remote")
 
 
 def release_changelog(repo: Repo, version: Version) -> Commit:
