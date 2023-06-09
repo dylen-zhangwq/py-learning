@@ -18,10 +18,20 @@ from sphinx.environment import BuildEnvironment
 from sphinx.ext.autodoc import Options
 from sphinx.ext.extlinks import ExternalLinksChecker
 
-from py_learning import __version__
 
-sys.path.insert(0, os.path.abspath(os.getcwd()))
+def get_version() -> str:
+    about: dict[str, str] = {}
+    here = os.path.abspath(os.path.dirname(__file__))
+    parent_path = Path(here).parent
+    sys.path.insert(0, os.path.join(parent_path, "src"))
 
+    version_path = os.path.join(parent_path, "src/py_learning", "version.py")
+    with open(version_path, encoding="utf-8") as f:
+        exec(f.read(), about)
+    return about["__version__"]
+
+
+__version__ = get_version()
 company, name = "dylen-zhangwq", "py-learning"
 release, version = __version__, ".".join(__version__.split(".")[:2])
 copyright = f"{company}"
