@@ -1,0 +1,148 @@
+from __future__ import annotations
+
+import os.path
+import re
+import subprocess
+import sys
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+from subprocess import check_output
+from typing import Any
+
+from docutils.nodes import Element, reference
+from sphinx.addnodes import pending_xref
+from sphinx.application import Sphinx
+from sphinx.builders import Builder
+from sphinx.domains.python import PythonDomain
+from sphinx.environment import BuildEnvironment
+from sphinx.ext.autodoc import Options
+from sphinx.ext.extlinks import ExternalLinksChecker
+
+
+def get_version() -> str:
+    about: dict[str, str] = {}
+    here = os.path.abspath(os.path.dirname(__file__))
+    parent_path = Path(here).parent
+    sys.path.insert(0, os.path.join(parent_path, "src"))
+
+    version_path = os.path.join(parent_path, "src/py_learning", "version.py")
+    with open(version_path, encoding="utf-8") as f:
+        exec(f.read(), about)
+    return about["__version__"]
+
+
+__version__ = get_version()
+company, name = "dylen-zhangwq", "py-learning"
+release, version = __version__, ".".join(__version__.split(".")[:2])
+copyright = f"{company}"
+master_doc, source_suffix = "index", ".rst"
+
+html_theme = "furo"
+html_title, html_last_updated_fmt = "py-learning", "%Y-%m-%dT%H:%M:%S"
+pygments_style, pygments_dark_style = "sphinx", "monokai"
+html_static_path, html_css_files = ["_static"], ["custom.css"]
+html_logo, html_favicon = "_static/img/py_learning.svg", "_static/img/py_learning.ico"
+
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosectionlabel",
+    "sphinx.ext.extlinks",
+    "sphinx.ext.intersphinx",
+    "sphinx_argparse_cli",
+    "sphinx_autodoc_typehints",
+    "sphinx_inline_tabs",
+    "sphinx_copybutton",
+    "sphinx.ext.autosummary",
+]
+
+exclude_patterns = ["_build", "changelog/*", "_draft.rst"]
+autoclass_content, autodoc_member_order, autodoc_typehints = "class", "bysource", "none"
+autodoc_default_options = {
+    "member-order": "bysource",
+    "undoc-members": True,
+    "show-inheritance": True,
+}
+autosectionlabel_prefix_document = True
+
+extlinks = {
+    "issue": ("https://github.com/dylen-zhangwq/py-learning/issues/%s", "#%s"),
+    "pull": ("https://github.com/dylen-zhangwq/py-learning/pull/%s", "PR #%s"),
+    "discussion": ("https://github.com/dylen-zhangwq/py-learning/discussions/%s", "#%s"),
+    "user": ("https://github.com/%s", "@%s"),
+    "gh_repo": ("https://github.com/%s", "%s"),
+    "gh": ("https://github.com/%s", "%s"),
+    "pypi": ("https://pypi.org/project/%s", "%s"),
+}
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "packaging": ("https://packaging.pypa.io/en/latest", None),
+}
+nitpicky = True
+nitpick_ignore = []
+linkcheck_workers = 10
+linkcheck_ignore = [
+    re.escape(i)
+    for i in (
+        r"https://github.com/dylen-zhangwq/py-learning/issues/new?title=Trouble+with+development+environment",
+        r"https://www.unix.org/version2/sample/abort.html",
+    )
+]
+extlinks_detect_hardcoded_links = True
+
+
+def process_signature(
+    app: Sphinx,  # noqa: U100
+    objtype: str,
+    name: str,  # noqa: U100
+    obj: Any,  # noqa: U100
+    options: Options,
+    args: str,  # noqa: U100
+    retann: str | None,  # noqa: U100
+) -> None | tuple[None, None]:
+    # skip-member is not checked for class level docs, so disable via signature processing
+    return (None, None) if objtype == "class" and "__init__" in options.get("exclude-members", set()) else None
+
+
+def setup(app: Sphinx) -> None:
+    here = Path(__file__).parent
+    root, exe = here.parent, Path(sys.executable)
+    towncrier = exe.with_name(f"towncrier{exe.suffix}")
+    cmd = [str(towncrier), "build", "--draft", "--version", "NEXT"]
+    new = check_output(cmd, cwd=root, text=True, stderr=subprocess.DEVNULL)
+    (root / "docs" / "_draft.rst").write_text("" if "No significant changes" in new else new)
+
+    class PatchedPythonDomain(PythonDomain):
+        def resolve_xref(
+            self,
+            env: BuildEnvironment,
+            fromdocname: str,
+            builder: Builder,
+            type: str,
+            target: str,
+            node: pending_xref,
+            contnode: Element,
+        ) -> Element:
+            mapping = {
+                "_io.TextIOWrapper": "io.TextIOWrapper",
+                "tox.config.of_type.T": "typing.TypeVar",  # used by Sphinx bases
+                "tox.config.loader.api.T": "typing.TypeVar",  # used by Sphinx bases
+                "tox.config.loader.convert.T": "typing.TypeVar",  # used by Sphinx bases
+                "tox.tox_env.installer.T": "typing.TypeVar",  # used by Sphinx bases
+                "concurrent.futures._base.Future": "concurrent.futures.Future",
+            }
+            if target in mapping:
+                target = node["reftarget"] = mapping[target]
+                # node.children[0].children[0] = Text(target, target)
+            return super().resolve_xref(env, fromdocname, builder, type, target, node, contnode)
+
+    app.connect("autodoc-process-signature", process_signature, priority=400)
+    app.add_domain(PatchedPythonDomain, override=True)
+    tox_cfg = SourceFileLoader("tox_conf", str(here / "tox_conf.py")).load_module().ToxConfig
+    app.add_directive(tox_cfg.name, tox_cfg)
+
+    def check_uri(self, refnode: reference) -> None:
+        if refnode.document.attributes["source"].endswith("index.rst"):
+            return  # do not use for the index file
+        return prev_check(self, refnode)
+
+    prev_check, ExternalLinksChecker.check_uri = ExternalLinksChecker.check_uri, check_uri

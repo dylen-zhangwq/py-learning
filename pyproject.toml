@@ -17,7 +17,7 @@ keywords = [
 ]
 license = "Apache-2.0"
 authors = [
-    { name = "dylen", email = "dylen.zhangwq@gmail.com" },
+    { name = "Dylen", email = "dylen.zhangwq@gmail.com" },
 ]
 maintainers = [
     { name = "Rebecca", email = "rebecca.xuc@gmail.com" },
@@ -87,7 +87,7 @@ Source = "https://github.com/dylen-zhangwq/py-learning"
 
 [tool.hatch]
 build.dev-mode-dirs = ["src"]
-build.hooks.vcs.version-file = "src/py_learning/__about__.py"
+build.hooks.vcs.version-file = "src/py_learning/version.py"
 build.targets.sdist.include = ["/src", "/tests", "/tox.ini"]
 version.source = "vcs"
 
