@@ -1,6 +1,7 @@
 """Handles creating a release PR"""
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from subprocess import check_call
 
@@ -54,7 +55,8 @@ def get_upstream(repo: Repo) -> Remote:
 
 def release_changelog(repo: Repo, version: Version) -> Commit:
     print("generate release commit")
-    check_call(["towncrier", "build", "--yes", "--version", version.public], cwd=str(ROOT_SRC_DIR))
+    cmd = f"towncrier build --yes --config {str(ROOT_SRC_DIR)}/pyproject.toml --version v{version.public}"
+    os.system(cmd)
     release_commit = repo.index.commit(f"release {version}")
     return release_commit
 
