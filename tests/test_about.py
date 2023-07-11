@@ -13,6 +13,6 @@ def test_version() -> None:
     path = os.path.join(parent_path, "src/py_learning", "__about__.py")
     print(parent_path)
     print(path)
-    with open(os.path.join(parent_path, "src/py_learning", "__about__.py"), encoding="utf-8") as f:
+    with open(os.path.join(parent_path, "py_learning", "__about__.py"), encoding="utf-8") as f:
         exec(f.read(), about)
     assert "__version__" in about

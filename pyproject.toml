@@ -75,9 +75,9 @@ Issues = "https://github.com/dylen-zhangwq/py-learning/issues"
 Source = "https://github.com/dylen-zhangwq/py-learning"
 
 [tool.hatch]
-build.dev-mode-dirs = ["src"]
-build.hooks.vcs.version-file = "src/py_learning/version.py"
-build.targets.sdist.include = ["/src", "/tests", "/tox.ini"]
+build.dev-mode-dirs = ["py_learning"]
+build.hooks.vcs.version-file = "py_learning/version.py"
+build.targets.sdist.include = ["/py_learning", "/tests", "/tox.ini"]
 version.source = "vcs"
 
 [tool.black]
@@ -87,12 +87,12 @@ line-length = 120
 html.show_contexts = true
 html.skip_covered = false
 paths.source = [
-    "src",
+    "py_learning",
     ".tox*/*/lib/python*/site-packages",
     ".tox*/pypy*/site-packages",
     ".tox*\\*\\Lib\\site-packages",
-    "*/src",
-    "*\\src",
+    "*/py_learning",
+    "*\\py_learning",
 ]
 report.fail_under = 88
 report.omit = []
